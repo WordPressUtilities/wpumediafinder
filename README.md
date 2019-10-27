@@ -1,12 +1,13 @@
 # WPU Media Finder
 
-Organize your media library
-
+Organize your media library with folders.
 
 ## Todo
 
-* [ ] Highlight Current menu.
+* [x] Dynamic title in media view.
+* [x] Highlight current menu.
+* [ ] Filter directly in list.
 * [ ] Load translations.
 * [ ] Auto-update.
-* [ ] Filter directly in list.
 * [ ] Better menu edit in image quick view.
+* [ ] Handle subfolders.

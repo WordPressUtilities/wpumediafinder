@@ -4,7 +4,7 @@
 Plugin Name: WPU Media Finder
 Description: Organize your media library.
 Plugin URI: https://github.com/WordPressUtilities/wpumediafinder
-Version: 0.1.0
+Version: 0.2.0
 Author: Darklg
 Author URI: http://darklg.me/
 License: MIT License
@@ -19,8 +19,11 @@ class WPUMediaFinder {
     }
 
     public function plugins_loaded() {
+        load_plugin_textdomain('wpumediafinder', false, dirname(plugin_basename(__FILE__)) . '/lang/');
         add_action('admin_menu', array(&$this, 'add_folders_links'));
         add_filter('ajax_query_attachments_args', array(&$this, 'attachment_query'), 10, 1);
+        add_filter('submenu_file', array(&$this, 'set_active_submenu'), 10, 2);
+        add_filter('admin_footer-upload.php', array(&$this, 'set_current_title'), 10, 2);
     }
 
     public function create_taxonomy() {
@@ -70,9 +73,32 @@ class WPUMediaFinder {
                 '- ' . esc_html($folder->name),
                 '- ' . esc_html($folder->name),
                 'upload_files',
-                admin_url('upload.php') . '?mediafolders=' . esc_attr($folder->slug)
+                'upload.php?mediafolders=' . esc_attr($folder->slug)
             );
         }
+    }
+
+    public function set_active_submenu($submenu_file, $parent_file) {
+        if ($parent_file == 'upload.php' && isset($_GET['mediafolders'])) {
+            $submenu_file = 'upload.php?mediafolders=' . urlencode($_GET['mediafolders']);
+        }
+        return $submenu_file;
+    }
+
+    public function set_current_title() {
+        if (!isset($_GET['mediafolders'])) {
+            return;
+        }
+        $folder = get_term_by('slug', $_GET['mediafolders'], 'mediafolders');
+        if (!isset($folder->name)) {
+            return;
+        }
+        $name = esc_html($folder->name);
+
+        echo "<script>
+        var jQtitle = jQuery('#wp-media-grid .wp-heading-inline');
+        jQtitle.text(jQtitle.text()+' - ${name}');
+        </script>';";
     }
 }
 
